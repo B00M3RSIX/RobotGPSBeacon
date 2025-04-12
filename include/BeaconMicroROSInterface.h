@@ -1,13 +1,12 @@
 #pragma once
 #include <Arduino.h>
-#include <micro_ros_arduino.h>
+#include <micro_ros_platformio.h>
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 #include <std_msgs/msg/bool.h>
 #include <sensor_msgs/msg/nav_sat_fix.h>
-#include <LEDAnimationController.h>
 #include "config.h"
 
 // Forward-Deklarationen
@@ -35,9 +34,7 @@ private:
     HatchManager* hatchManager;
     GPSManager* gpsManager;
     
-    // LED-Strip Controller (direkt in der MicroROS-Schnittstelle)
-    LEDAnimationController ledAnimationController;
-    
+   
     // MicroROS-Entitäten
     rclc_support_t support;
     rcl_node_t node;

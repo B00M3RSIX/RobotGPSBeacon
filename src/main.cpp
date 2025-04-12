@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "LEDAnimationController/LEDAnimationController.h"
 #include "config.h"
 #include "HatchManager.h"
 #include "GPSManager.h"
@@ -9,6 +10,7 @@
 HatchManager hatchManager(HATCH_LEFT_PIN, HATCH_RIGHT_PIN);
 GPSManager gpsManager;
 StatusLEDManager statusLED;
+LEDAnimationController ledAnimationController;
 
 // MicroROS-Interface (enthält den LED-Strip Controller)
 BeaconMicroROSInterface rosInterface(&hatchManager, &gpsManager);
@@ -18,13 +20,16 @@ bool rosConnected = false;
 bool previousRosConnected = false;
 
 void setup() {
+    Serial.begin(115200);
     // Initialisiere Hardware-Manager
     statusLED.begin();
-    statusLED.setColor(255,255,0);
+    
+    // Initialisiere LED-Strip Controller
+    ledAnimationController.begin();
 
     hatchManager.begin();
     gpsManager.begin(GPS_SERIAL, GPS_BAUD);
-    
+    delay(5000);
     
     // Setze anfänglichen LED-Status auf "Verbindung wird hergestellt"
     statusLED.setStatus(LED_STATUS_CONNECTING);
@@ -37,6 +42,10 @@ void setup() {
 }
 
 void loop() {
+
+    // Aktualisiere LED-Strip Animation (nicht-blockierend)
+    ledAnimationController.update();
+
     // Überprüfe MicroROS-Verbindung
     rosInterface.checkConnection();
     

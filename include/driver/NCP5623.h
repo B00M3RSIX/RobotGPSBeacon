@@ -2,9 +2,9 @@
 
 #include <Arduino.h>
 
-#define NCP5623_DEFAULT_ADDR 0x38
+#define NCP5623_DEFAULT_ADDR 0x39
 
-#define NCP5623_REG_ILED 0x7
+#define NCP5623_REG_ILED 0x1
 #define NCP5623_REG_CHANNEL_BASE 0x2
 
 class NCP5623 {

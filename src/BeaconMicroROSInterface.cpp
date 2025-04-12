@@ -15,14 +15,15 @@ BeaconMicroROSInterface::BeaconMicroROSInterface(HatchManager* hatchManager, GPS
 
 void BeaconMicroROSInterface::initialize() {
     // Setup MicroROS transport
-    set_microros_transports();
+    Serial2.begin(115200);
+    set_microros_serial_transports(Serial2);
     
-    // Initialisiere LED-Strip Controller
-    ledAnimationController.begin();
+
     
     // Reset timers
     last_publish_hatch = 0;
     last_publish_gps = 0;
+
 }
 
 void BeaconMicroROSInterface::checkConnection() {
@@ -38,7 +39,8 @@ void BeaconMicroROSInterface::checkConnection() {
                 ping_timeout_ms = 100;
             }
         }
-    } else if (microros_initialized) {
+    } 
+/*     else if (microros_initialized) {
         microros_destroying = true;
         destroyEntities();
         microros_initialized = false;
@@ -46,17 +48,14 @@ void BeaconMicroROSInterface::checkConnection() {
         
         // Set shorter ping timeout for faster reconnection
         ping_timeout_ms = 50;
-    }
+    } */
 }
 
 bool BeaconMicroROSInterface::processMessages() {
     if (!microros_initialized) {
         return false;
     }
-    
-    // Aktualisiere LED-Strip Animation (nicht-blockierend)
-    ledAnimationController.update();
-    
+
     // Verarbeite MicroROS-Nachrichten
     return (rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1)) == RCL_RET_OK);
 }
@@ -67,6 +66,8 @@ bool BeaconMicroROSInterface::publishHatchStatus() {
     }
     
     msg_hatch_is_open.data = hatchManager->isHatchOpen();
+    Serial.print("Hatch: ");
+    Serial.println(hatchManager->isHatchOpen());
     RCCHECK(rcl_publish(&pub_hatch_is_open, &msg_hatch_is_open, NULL));
     last_publish_hatch = 0;
     
@@ -105,6 +106,7 @@ bool BeaconMicroROSInterface::isConnected() const {
 }
 
 bool BeaconMicroROSInterface::createEntities() {
+    Serial.println("createEntities");
     // Initialize allocator
     allocator = rcl_get_default_allocator();
     
@@ -112,7 +114,7 @@ bool BeaconMicroROSInterface::createEntities() {
     RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
     
     // Create node
-    RCCHECK(rclc_node_init_default(&node, "beacon_node", ROS_NAMESPACE, &support));
+    RCCHECK(rclc_node_init_default(&node, "beacon_node", "", &support));
     
     // Create publishers
     RCCHECK(rclc_publisher_init_default(
@@ -130,18 +132,25 @@ bool BeaconMicroROSInterface::createEntities() {
     ));
     
     // Create executor
-    RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
-    
+    //executor = rclc_executor_get_zero_initialized_executor();
+    //RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
+    Serial.println("createEntities END");
+    microros_initialized = true;
+
     return true;
 }
 
 bool BeaconMicroROSInterface::destroyEntities() {
+    Serial.println("destroyEntities");
     RCCHECK(rcl_publisher_fini(&pub_hatch_is_open, &node));
     RCCHECK(rcl_publisher_fini(&pub_gps, &node));
-    RCCHECK(rclc_executor_fini(&executor));
-    RCCHECK(rcl_node_fini(&node));
-    RCCHECK(rclc_support_fini(&support));
+ 
     
+    RCCHECK(rcl_node_fini(&node));
+    //RCCHECK(rclc_executor_fini(&executor));
+    RCCHECK(rclc_support_fini(&support));
+    Serial.println("destroyEntities END");
     delay(100);
+    microros_initialized = false;
     return true;
 }

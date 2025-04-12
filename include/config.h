@@ -1,8 +1,8 @@
 #pragma once
 
 // Publish-Raten (in Millisekunden)
-#define HATCH_PUBLISH_RATE_MS 2000
-#define GPS_PUBLISH_RATE_MS 2000
+#define HATCH_PUBLISH_RATE_MS 500
+#define GPS_PUBLISH_RATE_MS 500
 #define LED_ANIMATION_FEEDBACK_RATE_MS 200
 
 // Pin-Definitionen

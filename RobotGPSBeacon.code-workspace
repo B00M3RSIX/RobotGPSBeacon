@@ -4,5 +4,23 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"array": "cpp",
+			"*.tcc": "cpp",
+			"deque": "cpp",
+			"forward_list": "cpp",
+			"list": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"vector": "cpp",
+			"string_view": "cpp",
+			"memory": "cpp",
+			"random": "cpp",
+			"initializer_list": "cpp",
+			"mutex": "cpp",
+			"regex": "cpp"
+		}
+	}
 }
