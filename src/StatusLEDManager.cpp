@@ -12,8 +12,8 @@ void StatusLEDManager::begin() {
     Wire.begin();
     rgbLED.begin();
     delay(100);
-    rgbLED.setColor(0, 100, 0);
-    delay(500);
+    rgbLED.setColor(0, 0, 0);
+    delay(100);
 }
 
 void StatusLEDManager::setStatus(BeaconLEDStatus status) {

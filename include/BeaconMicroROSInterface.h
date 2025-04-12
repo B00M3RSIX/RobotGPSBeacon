@@ -14,21 +14,29 @@ class HatchManager;
 class GPSManager;
 
 // Error checking macros
-#define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){return false;}}
+#define RCCHECK(fn)     { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){return false;}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){return false;}}
 
 class BeaconMicroROSInterface {
 public:
+
+    enum states {
+        WAITING_AGENT,
+        AGENT_AVAILABLE,
+        AGENT_CONNECTED,
+        AGENT_DISCONNECTED
+    } state;
+
     BeaconMicroROSInterface(HatchManager* hatchManager, GPSManager* gpsManager);
     
     void initialize();
-    void checkConnection();
+    void update();
     bool processMessages();
     
     bool publishHatchStatus();
     bool publishGPSData();
     
-    bool isConnected() const;
+    states getConnectionState() ;
     
 private:
     HatchManager* hatchManager;
@@ -50,11 +58,11 @@ private:
     sensor_msgs__msg__NavSatFix msg_gps;
     
     // Status
-    bool microros_initialized;
-    bool microros_destroying;
     int ping_timeout_ms;
     elapsedMillis last_publish_hatch;
     elapsedMillis last_publish_gps;
+
+    int64_t time_ms;
     
     // Hilfsmethoden
     bool createEntities();

@@ -23,4 +23,7 @@ private:
     unsigned long last_serial_check;
     uint32_t serial_bytes_received;
     uint32_t last_serial_bytes_count;
+    void handleNMEASentence(char c);
+    uint8_t nmea_idx = 0;
+    char nmea_buffer[100];
 };

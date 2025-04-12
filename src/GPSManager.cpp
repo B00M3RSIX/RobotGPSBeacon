@@ -31,7 +31,7 @@ void GPSManager::update() {
     // Lese GPS-Daten
     while (gpsSerial && gpsSerial->available()) {
         char c = gpsSerial->read();
-        
+        //handleNMEASentence(c);
         // Verarbeite das Zeichen mit TinyGPSPlus
         if (gps.encode(c)) {
             // Neue Daten wurden verarbeitet
@@ -41,8 +41,8 @@ void GPSManager::update() {
         serial_bytes_received++;
     }
     
-    // Prüfe alle 2 Sekunden, ob Daten empfangen werden
-    if (millis() - last_serial_check > 2000) {
+    // Prüfe alle x Millisekunden, ob Daten empfangen werden
+    if (millis() - last_serial_check > 200) {
         checkSerialData();
         last_serial_check = millis();
     }
@@ -137,3 +137,23 @@ void GPSManager::checkSerialData() {
         }
     }
 }
+
+void GPSManager::handleNMEASentence(char c) {
+    // Store character in buffer
+    if (c == '$') {
+      // Start of a new sentence
+      nmea_idx = 0;
+    }
+    
+    if (nmea_idx < sizeof(nmea_buffer) - 1) {
+      nmea_buffer[nmea_idx++] = c;
+    }
+    
+    if (c == '\n') {
+      // End of sentence
+      nmea_buffer[nmea_idx] = '\0';
+      Serial.print("NMEA: ");
+      Serial.print(nmea_buffer);
+      nmea_idx = 0;
+    }
+  }
